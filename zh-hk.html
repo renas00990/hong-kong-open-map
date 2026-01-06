@@ -43,6 +43,13 @@
     .header-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
     .header-links a:hover { color: var(--text); }
     .lang-switcher { display: flex; gap: 8px; font-size: 0.8rem; background: var(--bg-secondary); padding: 4px 12px; border-radius: 100px; border: 1px solid var(--border); }
+    @media (max-width: 600px) {
+      .header-content { flex-wrap: wrap; gap: 16px; }
+      h1 { font-size: 1.1rem; width: 100%; text-align: center; }
+      .header-links { width: 100%; justify-content: center; gap: 16px; flex-wrap: wrap; }
+      .hero h2 { font-size: 2rem; }
+      .hero p { font-size: 1rem; }
+    }
     .lang-switcher a { color: var(--text-secondary); text-decoration: none; }
     .lang-switcher a.active { color: var(--text); font-weight: 600; }
     
@@ -342,11 +349,11 @@
     const RASTER_LABEL_ZH = 'https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/label/hk/tc/wgs84/{z}/{x}/{y}.png';
     const RASTER_LABEL_EN = 'https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/label/hk/en/wgs84/{z}/{x}/{y}.png';
     function createStyle(lang = 'zh', showLabels = true) {
-      const style = { version: 8, sources: { 'hk-basemap': { type: 'raster', tiles: [RASTER_TILE], tileSize: 256, attribution: 'wangwailok.com | © Lands Department' } }, layers: [{ id: 'basemap', type: 'raster', source: 'hk-basemap' }] };
+      const style = { version: 8, sources: { 'hk-basemap': { type: 'raster', tiles: [RASTER_TILE], tileSize: 256, attribution: '<a href="https://www.wangwailok.com/" target="_blank">Lok Wang</a> | © 地政總署' } }, layers: [{ id: 'basemap', type: 'raster', source: 'hk-basemap' }] };
       if (showLabels) { style.sources['hk-label'] = { type: 'raster', tiles: [lang === 'en' ? RASTER_LABEL_EN : RASTER_LABEL_ZH], tileSize: 256 }; style.layers.push({ id: 'labels', type: 'raster', source: 'hk-label' }); }
       return style;
     }
-    let map = null, pinMap = null;
+    let map = null, pinMap = null, panLocked = false;
     function initMaps() {
       map = new maplibregl.Map({ container: 'demo-map', style: createStyle('zh', true), center: [114.1694, 22.3193], zoom: 12 });
       pinMap = new maplibregl.Map({ container: 'pin-map', style: createStyle('zh', true), center: [114.1694, 22.3193], zoom: 12 });
@@ -354,26 +361,66 @@
     }
     function updateDemo() {
       const lang = document.getElementById('ctrl-lang').value;
+      const zoom = parseInt(document.getElementById('ctrl-zoom').value);
       const showLabels = document.getElementById('ctrl-labels').checked;
       map.setStyle(createStyle(lang, showLabels));
+      map.setZoom(zoom);
     }
     let pinMode = false, pins = [], pinMarkers = [];
-    function setPinMode(e) { 
-        pinMode = e; 
-        document.getElementById('pin-map').classList.toggle('pin-mode', e);
-        document.getElementById('pin-mode-badge').querySelector('span:last-child').textContent = '放 Pin 模式: ' + (e ? '開咗' : '熄咗');
+    function setPinMode(on) {
+      pinMode = on;
+      document.getElementById('pin-map').classList.toggle('pin-mode', on);
+      document.getElementById('btn-pin-off').classList.toggle('active', !on);
+      document.getElementById('btn-pin-on').classList.toggle('active', on);
+      document.getElementById('pin-mode-badge').querySelector('span:last-child').textContent = '放 Pin 模式: ' + (on ? '開咗' : '熄咗');
+      document.getElementById('pin-mode-badge').classList.toggle('active', on);
     }
-    function addPin(lng, lat) { 
+    function setLockPan(lock) {
+      panLocked = lock;
+      document.getElementById('pin-map').classList.toggle('locked', lock);
+      document.getElementById('btn-pan-unlock').classList.toggle('active', !lock);
+      document.getElementById('btn-pan-lock').classList.toggle('active', lock);
+      document.getElementById('pan-lock-badge').querySelector('span:last-child').textContent = '移動地圖: ' + (lock ? '鎖咗' : '冇鎖');
+      document.getElementById('pan-lock-badge').querySelector('.status-dot').classList.toggle('locked', lock);
+      if (lock) {
+        pinMap.dragPan.disable();
+        pinMap.scrollZoom.disable();
+        pinMap.doubleClickZoom.disable();
+        pinMap.touchZoomRotate.disable();
+      } else {
+        pinMap.dragPan.enable();
+        pinMap.scrollZoom.enable();
+        pinMap.doubleClickZoom.enable();
+        pinMap.touchZoomRotate.enable();
+      }
+    }
+    function addPin(lng, lat) {
       const marker = new maplibregl.Marker({ color: document.getElementById('pin-color').value }).setLngLat([lng, lat]).addTo(pinMap);
       pins.push({ position: [lng, lat] }); pinMarkers.push(marker); updatePinsList();
     }
-    function updatePinsList() { 
+    function updatePinsList() {
       document.getElementById('pin-count').textContent = pins.length;
       document.getElementById('coords-preview').textContent = JSON.stringify(pins, null, 2);
+      const listEl = document.getElementById('pins-list');
+      if (pins.length === 0) {
+        listEl.innerHTML = '<div class="pins-list-empty">未有 Pin 喎，試下喺地圖篤一下。</div>';
+      } else {
+        listEl.innerHTML = pins.map((p, i) =>
+          '<div class="pin-item"><span>#' + (i+1) + '</span><code>[' + p.position[0].toFixed(4) + ', ' + p.position[1].toFixed(4) + ']</code></div>'
+        ).join('');
+      }
     }
     function clearAllPins() { pinMarkers.forEach(m => m.remove()); pins = []; pinMarkers = []; updatePinsList(); }
+    function exportPins() {
+      const json = JSON.stringify(pins, null, 2);
+      navigator.clipboard.writeText(json).then(() => alert('已複製到剪貼簿！'));
+    }
+    function copyCode(id) {
+      const code = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(code).then(() => alert('已複製！'));
+    }
     function toggleFaq(btn) { btn.closest('.faq-item').classList.toggle('open'); }
-    function copyToClipboard(t) { navigator.clipboard.writeText(t); }
+    function copyToClipboard(t) { navigator.clipboard.writeText(t).then(() => alert('已複製: ' + t)); }
     window.onload = initMaps;
   </script>
 </body>
