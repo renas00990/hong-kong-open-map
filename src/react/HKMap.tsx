@@ -80,6 +80,8 @@ export const HKMap = forwardRef<maplibregl.Map | null, HKMapComponentProps>((pro
         if (style.sources) {
           Object.keys(style.sources).forEach(key => {
             const source = style.sources[key];
+            // Remove attribution from sources to prevent duplicate (we add our own)
+            delete source.attribution;
             if (source.url && source.url.startsWith('../../')) {
               // HK GeoData API uses {z}/{y}/{x} tile format (not standard {z}/{x}/{y})
               delete source.url;

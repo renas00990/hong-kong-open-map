@@ -1,6 +1,6 @@
 {
   "name": "hong-kong-open-map",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "Free and open-source map component library for Hong Kong applications using official government vector tiles.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -25,8 +25,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "dev": "vite",
-    "dev:demo": "vite serve demo --port 3001 --open",
+    "dev": "vite --open",
+    "dev:demo": "vite --port 3001 --open",
+    "dev:react": "vite serve examples/react-typescript --port 3002 --open",
     "dev:examples": "vite serve . --port 3000",
     "build": "vite build && tsc",
     "preview": "vite preview",

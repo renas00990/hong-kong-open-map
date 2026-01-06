@@ -353,31 +353,45 @@
     </footer>
   </div>
   
-  <script src="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.js"></script>
-  <script>
-    const RASTER_TILE = 'https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/basemap/wgs84/{z}/{x}/{y}.png';
-    const RASTER_LABEL_ZH = 'https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/label/hk/tc/wgs84/{z}/{x}/{y}.png';
-    const RASTER_LABEL_EN = 'https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/label/hk/en/wgs84/{z}/{x}/{y}.png';
-    function createStyle(lang = 'en', showLabels = true) {
-      const style = { version: 8, sources: { 'hk-basemap': { type: 'raster', tiles: [RASTER_TILE], tileSize: 256, attribution: '<a href="https://www.wangwailok.com/" target="_blank">Lok Wang</a> | © Lands Department' } }, layers: [{ id: 'basemap', type: 'raster', source: 'hk-basemap' }] };
-      if (showLabels) { style.sources['hk-label'] = { type: 'raster', tiles: [lang === 'en' ? RASTER_LABEL_EN : RASTER_LABEL_ZH], tileSize: 256 }; style.layers.push({ id: 'labels', type: 'raster', source: 'hk-label' }); }
-      return style;
-    }
+  <script type="module">
+    import { HKMap } from './src/vanilla/index.ts';
+    import maplibregl from 'maplibre-gl';
+    
     let map = null, pinMap = null, panLocked = false;
+    
     function initMaps() {
-      map = new maplibregl.Map({ container: 'demo-map', style: createStyle('en', true), center: [114.1694, 22.3193], zoom: 12 });
-      pinMap = new maplibregl.Map({ container: 'pin-map', style: createStyle('en', true), center: [114.1694, 22.3193], zoom: 12 });
-      pinMap.on('click', (e) => { if (pinMode) addPin(e.lngLat.lng, e.lngLat.lat); });
+      map = new HKMap('demo-map', { 
+        center: [114.1694, 22.3193], 
+        zoom: 12,
+        language: 'en',
+        showLabels: true
+      });
+      
+      pinMap = new HKMap('pin-map', { 
+        center: [114.1694, 22.3193], 
+        zoom: 12,
+        language: 'en',
+        showLabels: true,
+        onClick: (e) => { if (pinMode) addPin(e.lngLat.lng, e.lngLat.lat); }
+      });
     }
-    function updateDemo() {
+    
+    window.updateDemo = function() {
       const lang = document.getElementById('ctrl-lang').value;
       const zoom = parseInt(document.getElementById('ctrl-zoom').value);
       const showLabels = document.getElementById('ctrl-labels').checked;
-      map.setStyle(createStyle(lang, showLabels));
-      map.setZoom(zoom);
+      const theme = document.getElementById('ctrl-theme').value;
+      
+      if (map) {
+        map.setTheme(theme);
+        map.setLanguage(lang);
+        map.getMapInstance().setZoom(zoom);
+      }
     }
+    
     let pinMode = false, pins = [], pinMarkers = [];
-    function setPinMode(on) {
+    
+    window.setPinMode = function(on) {
       pinMode = on;
       document.getElementById('pin-map').classList.toggle('pin-mode', on);
       document.getElementById('btn-pin-off').classList.toggle('active', !on);
@@ -385,29 +399,34 @@
       document.getElementById('pin-mode-badge').querySelector('span:last-child').textContent = 'Pin Mode: ' + (on ? 'ON' : 'OFF');
       document.getElementById('pin-mode-badge').classList.toggle('active', on);
     }
-    function setLockPan(lock) {
+    
+    window.setLockPan = function(lock) {
       panLocked = lock;
+      const pinMapInstance = pinMap.getMapInstance();
       document.getElementById('pin-map').classList.toggle('locked', lock);
       document.getElementById('btn-pan-unlock').classList.toggle('active', !lock);
       document.getElementById('btn-pan-lock').classList.toggle('active', lock);
       document.getElementById('pan-lock-badge').querySelector('span:last-child').textContent = 'Pan: ' + (lock ? 'Locked' : 'Unlocked');
       document.getElementById('pan-lock-badge').querySelector('.status-dot').classList.toggle('locked', lock);
       if (lock) {
-        pinMap.dragPan.disable();
-        pinMap.scrollZoom.disable();
-        pinMap.doubleClickZoom.disable();
-        pinMap.touchZoomRotate.disable();
+        pinMapInstance.dragPan.disable();
+        pinMapInstance.scrollZoom.disable();
+        pinMapInstance.doubleClickZoom.disable();
+        pinMapInstance.touchZoomRotate.disable();
       } else {
-        pinMap.dragPan.enable();
-        pinMap.scrollZoom.enable();
-        pinMap.doubleClickZoom.enable();
-        pinMap.touchZoomRotate.enable();
+        pinMapInstance.dragPan.enable();
+        pinMapInstance.scrollZoom.enable();
+        pinMapInstance.doubleClickZoom.enable();
+        pinMapInstance.touchZoomRotate.enable();
       }
     }
+    
     function addPin(lng, lat) {
-      const marker = new maplibregl.Marker({ color: document.getElementById('pin-color').value }).setLngLat([lng, lat]).addTo(pinMap);
+      const pinMapInstance = pinMap.getMapInstance();
+      const marker = new maplibregl.Marker({ color: document.getElementById('pin-color').value }).setLngLat([lng, lat]).addTo(pinMapInstance);
       pins.push({ position: [lng, lat] }); pinMarkers.push(marker); updatePinsList();
     }
+    
     function updatePinsList() {
       document.getElementById('pin-count').textContent = pins.length;
       document.getElementById('coords-preview').textContent = JSON.stringify(pins, null, 2);
@@ -420,18 +439,24 @@
         ).join('');
       }
     }
-    function clearAllPins() { pinMarkers.forEach(m => m.remove()); pins = []; pinMarkers = []; updatePinsList(); }
-    function exportPins() {
+    
+    window.clearAllPins = function() { pinMarkers.forEach(m => m.remove()); pins = []; pinMarkers = []; updatePinsList(); }
+    
+    window.exportPins = function() {
       const json = JSON.stringify(pins, null, 2);
       navigator.clipboard.writeText(json).then(() => alert('Pins copied to clipboard!'));
     }
-    function copyCode(id) {
+    
+    window.copyCode = function(id) {
       const code = document.getElementById(id).textContent;
       navigator.clipboard.writeText(code).then(() => alert('Code copied!'));
     }
-    function toggleFaq(btn) { btn.closest('.faq-item').classList.toggle('open'); }
-    function copyToClipboard(t) { navigator.clipboard.writeText(t).then(() => alert('Copied: ' + t)); }
-    window.onload = initMaps;
+    
+    window.toggleFaq = function(btn) { btn.closest('.faq-item').classList.toggle('open'); }
+    
+    window.copyToClipboard = function(t) { navigator.clipboard.writeText(t).then(() => alert('Copied: ' + t)); }
+    
+    initMaps();
   </script>
 </body>
 </html>

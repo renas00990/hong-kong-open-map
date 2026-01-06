@@ -26,9 +26,16 @@ export const ZOOM_CONSTRAINTS = {
   defaultZoom: 12
 };
 
+// Lands Department logo URL for map attribution
+export const LANDS_DEPT_LOGO_URL = 'https://api.hkmapservice.gov.hk/mapapi/landsdlogo.jpg';
+
 export const ATTRIBUTION = `
+  <a href="https://maplibre.org" target="_blank" style="color: inherit; text-decoration: none;">
+    © MapLibre
+  </a>
+  |
   <a href="https://api.portal.hkmapservice.gov.hk/disclaimer" target="_blank" style="color: inherit; text-decoration: none;">
     © Map information from Lands Department
   </a>
-  <img src="https://api.hkmapservice.gov.hk/mapapi/landsdlogo.jpg" alt="Lands Department Logo" style="width: 20px; height: 20px; vertical-align: middle; margin-left: 4px;" />
+  <img src="https://api.hkmapservice.gov.hk/mapapi/landsdlogo.jpg" alt="Lands Department Logo" style="height: 20px; width: auto; vertical-align: middle; margin-left: 4px;" />
 `;
