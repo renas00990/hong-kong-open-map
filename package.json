@@ -1,6 +1,6 @@
 {
   "name": "hong-kong-open-map",
-  "version": "1.1.1",
+  "version": "1.1.6",
   "description": "Free and open-source map component library for Hong Kong applications using official government vector tiles.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -20,7 +20,9 @@
     "./style.css": "./dist/style.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "dev": "vite",
@@ -37,7 +39,6 @@
     "react-dom": "^18.0.0"
   },
   "dependencies": {
-    "hong-kong-open-map": "/Users/wangwailok/Documents/GitHub/hong-kong-open-map",
     "maplibre-gl": "^4.0.0"
   },
   "devDependencies": {
@@ -63,5 +64,13 @@
     "vanilla-js"
   ],
   "author": "wangwailok",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wangwailok/hong-kong-open-map.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wangwailok/hong-kong-open-map/issues"
+  },
+  "homepage": "https://github.com/wangwailok/hong-kong-open-map#readme"
 }
